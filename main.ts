@@ -27,7 +27,7 @@ radio.onReceivedString(function (receivedString: string) {
                 leftMotorSpeed = Math.constrain(leftMotorSpeed, -255, 255)
                 rightMotorSpeed = Math.constrain(rightMotorSpeed, -255, 255)
 
-if(Math.abs(naklonX) > 20 && Math.abs(naklonY) > 20){
+if(Math.abs(naklonX) > 50 || Math.abs(naklonY) > 50){
                 PCAmotor.MotorRun(PCAmotor.Motors.M1, leftMotorSpeed)
                 PCAmotor.MotorRun(PCAmotor.Motors.M4, rightMotorSpeed)
 } else {
@@ -39,36 +39,38 @@ if(Math.abs(naklonX) > 20 && Math.abs(naklonY) > 20){
 if(receivedString =="park"){
     parkSensor = !parkSensor
 
-    if (parkSensor){
-            PCAmotor.Servo(PCAmotor.Servos.S1, 150);
-            basic.pause(500);
-            PCAmotor.Servo(PCAmotor.Servos.S1, 200);
-            basic.pause(500);
-            PCAmotor.Servo(PCAmotor.Servos.S1, 100);
-            basic.pause(500);
-            PCAmotor.Servo(PCAmotor.Servos.S1, 150);
-        }
+if (parkSensor) {
+        PCAmotor.Servo(PCAmotor.Servos.S1, 150);
+        basic.pause(500);
+        PCAmotor.Servo(PCAmotor.Servos.S1, 200);
+        basic.pause(500);
+        PCAmotor.Servo(PCAmotor.Servos.S1, 100);
+        basic.pause(500);
+        PCAmotor.Servo(PCAmotor.Servos.S1, 150);
     }
+}  
 })
 
 basic.forever(function(){
-    if (parkSensor){
-        let distance = Sensors.ping(DigitalPin.P2, DigitalPin.P1, null)
+    
+    if(parkSensor) {
+        let distance = Sensors.ping(DigitalPin.P2, DigitalPin.P1, 500)
+        basic.pause(30)
 
-        if (distance < 40 && distance > 30) {
+        if (distance <= 40 && distance > 30) {
             music.playTone(400, 250);
             basic.pause(700);
-            } else if (distance <= 30 && distance > 20) {
-                music.playTone(400, 250);
-                basic.pause(400);
-                } else if (distance <= 20 && distance > 10) {
-                    music.playTone(400, 250);
-                    basic.pause(100);
-                    } else if (distance < 10) {
-                        music.playTone(400, 1000);
-                        }
+        } else if (distance <= 30 && distance > 20) {
+            music.playTone(400, 250);
+            basic.pause(400);
+        } else if (distance <= 20 && distance > 10) {
+            music.playTone(400, 250);
+            basic.pause(100);
+        } else if (distance <= 10) {
+            music.playTone(400, 1000);
+        }
     }
-})
+})    
 
 radio.onReceivedNumber(function (receivedNumber: number) {
     if (receivedNumber == 6057) {
