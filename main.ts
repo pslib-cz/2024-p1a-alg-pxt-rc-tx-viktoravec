@@ -1,5 +1,5 @@
 let ready: boolean = false
-let backSensor: boolean = false
+let parkSensor: boolean = false
 
 radio.on()
 radio.setFrequencyBand(50)
@@ -36,10 +36,10 @@ if(Math.abs(naklonX) > 20 && Math.abs(naklonY) > 20){
     }
 }
         
-if(receivedString =="back"){
-backSensor = !backSensor
+if(receivedString =="park"){
+    parkSensor = !parkSensor
 
-if(backSensor){
+    if (parkSensor){
             PCAmotor.Servo(PCAmotor.Servos.S1, 150);
             basic.pause(500);
             PCAmotor.Servo(PCAmotor.Servos.S1, 200);
@@ -52,7 +52,7 @@ if(backSensor){
 })
 
 basic.forever(function(){
-    if(backSensor){
+    if (parkSensor){
         let distance = Sensors.ping(DigitalPin.P2, DigitalPin.P1, null)
 
         if (distance < 40 && distance > 30) {
