@@ -9,12 +9,14 @@ radio.onReceivedString(function (receivedString: string) {
     if (receivedString == "start") {
         ready = true
         }
-
         if (ready) {
             let parts = receivedString.split(",")
-            if (parts.length == 2) {
-                let naklonX = parseFloat(parts[0])
-                let naklonY = parseFloat(parts[1])
+            if (parts.length == 5) {
+                let naklonX = parseFloat(parts[0]);
+                let naklonY = parseFloat(parts[1]);
+                let horn = parseFloat(parts[2]);
+                let park = parseFloat(parts[3]);
+                let head
 
                 naklonX = Math.constrain(naklonX, -1023, 1023)
                 naklonY = Math.constrain(naklonY, -1023, 1023)
@@ -33,60 +35,66 @@ if(Math.abs(naklonX) > 50 || Math.abs(naklonY) > 50){
 } else {
     PCAmotor.MotorStopAll()
         }
+
+        if (horn == 1) {
+            basic.showLeds(`
+            # . . . #
+            . # . # .
+            . . # . .
+            . # . # .
+            # . . . #
+            `)
+            music.playTone(500, 150)
+            basic.pause(100)
+            music.playTone(500, 650)
+            basic.pause(200)
+            basic.clearScreen()
+        }
+
+        if (park == 1) {
+            parkSensor = !parkSensor
+
+            if (parkSensor) {
+                PCAmotor.Servo(PCAmotor.Servos.S1, 150);
+                basic.pause(500);
+                PCAmotor.Servo(PCAmotor.Servos.S1, 200);
+                basic.pause(500);
+                PCAmotor.Servo(PCAmotor.Servos.S1, 100);
+                basic.pause(500);
+                PCAmotor.Servo(PCAmotor.Servos.S1, 150);
+            }
+        }
     }
 }
-        
-if(receivedString =="park"){
-    parkSensor = !parkSensor
-
-if (parkSensor) {
-        PCAmotor.Servo(PCAmotor.Servos.S1, 150);
-        basic.pause(500);
-        PCAmotor.Servo(PCAmotor.Servos.S1, 200);
-        basic.pause(500);
-        PCAmotor.Servo(PCAmotor.Servos.S1, 100);
-        basic.pause(500);
-        PCAmotor.Servo(PCAmotor.Servos.S1, 150);
-    }
-}  
 })
 
 basic.forever(function(){
-    
     if(parkSensor) {
         let distance = Sensors.ping(DigitalPin.P2, DigitalPin.P1, 500)
         basic.pause(30)
 
-        if (distance <= 40 && distance > 30) {
+        if (distance <= 40 && distance > 35) {
             music.playTone(400, 250);
-            basic.pause(700);
-        } else if (distance <= 30 && distance > 20) {
+            basic.pause(800);
+        } else if (distance <= 35 && distance > 30) {
+            music.playTone(400, 250);
+            basic.pause(500);
+        } else if (distance <= 30 && distance > 25) {
             music.playTone(400, 250);
             basic.pause(400);
-        } else if (distance <= 20 && distance > 10) {
+        } else if (distance <= 25 && distance > 20) {
+            music.playTone(400, 250);
+            basic.pause(300)
+        } else if (distance <= 20 && distance > 15) {
+            music.playTone(400, 250);
+            basic.pause(200);
+        } else if (distance <= 15 && distance > 7) {
             music.playTone(400, 250);
             basic.pause(100);
-        } else if (distance <= 10) {
+        }else if (distance <= 7) {
             music.playTone(400, 1000);
         }
     }
 })    
 
-radio.onReceivedNumber(function (receivedNumber: number) {
-    if (receivedNumber == 6057) {
 
-        basic.showLeds(`
-        # . . . #
-        . # . # .
-        . . # . .
-        . # . # .
-        # . . . #
-        `)
-        
-        music.playTone(500, 150)
-        basic.pause(100)
-        music.playTone(500, 650)
-        basic.pause(200)
-        basic.clearScreen()
-    }
-})
